@@ -88,6 +88,13 @@ export default class NavBar extends Component {
                                 <Link className="nav-link" to={"/trainer/editCoach"} >Edit Coaches</Link>
                             </li>
 
+                            <li className="nav-item">
+                                <Link className="nav-link" to={"/trainer/evaluations"} >Evaluations</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to={"/trainer/tests"} >Tests</Link>
+                            </li>
+
                         </ul>
                     </div>
                 </div>
