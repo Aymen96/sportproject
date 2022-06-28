@@ -1,0 +1,7 @@
+.table-row {
+    cursor: pointer;
+}
+
+.table-row-srow {
+    transition: all 1s;
+}

@@ -40,6 +40,10 @@ body, html, .App, #root, .auth-wrapper {
     max-height: 800px;
 }
 
+.data-view {
+    width: 1200px;
+}
+
 .csv-inner {
     width: 1000px;
     margin: auto;

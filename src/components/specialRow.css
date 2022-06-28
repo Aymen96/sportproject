@@ -1,0 +1,29 @@
+.srow-wrapper {
+    padding: 0px 25px;
+    display:block;
+    width: 100%;
+}
+
+.srow-header {
+    width:100%;
+    text-align: right;
+    display:block;
+}
+
+.srow-content {
+    width:100%;
+    display:flex;
+    flex-wrap: nowrap;
+}
+
+.srow-grid-view {
+    width: 100%;
+}
+
+.srow-grid-view tr {
+    width:50%;
+}
+
+.srow-grid-view tr td {
+    width: 50%;
+}

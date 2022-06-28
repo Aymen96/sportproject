@@ -51,8 +51,8 @@ function Main() {
                             <Route path='/trainer/adminMain' element={<div className="auth-inner"><CreateTest/></div>} />
                             <Route path='/trainer/addAthletes' element={<div className="auth-inner"><AddAthlete/></div>} />
                             <Route path='/trainer/editCoach' element={<div className="auth-inner"><EditCoach/></div>} />
-                            <Route path='/trainer/evaluations' element={<div className="auth-inner"><EvaluationsView/></div>}/>
-                            <Route path='/trainer/tests' element={<div className="auth-inner"><TestsView/></div>}/>
+                            <Route path='/trainer/evaluations' element={<div className="auth-inner data-view"><EvaluationsView/></div>}/>
+                            <Route path='/trainer/tests' element={<div className="auth-inner data-view"><TestsView/></div>}/>
 
                             <Route path='/csv/reader' element={<div className="csv-inner"><CsvReader/></div>} />
                         </Routes>

@@ -1,0 +1,14 @@
+.grid-view-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.grid-view-column {
+    width: 50%;
+    padding: 12px;
+}
+
+.grid-view-row {
+    height: auto;
+}

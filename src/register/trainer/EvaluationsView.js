@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import CustomTable from '../../components/CustomTable';
+import { evaluations, evaluationsHeadCells } from '../../temp-data/evaluations';
 
 export default class EvaluationsView extends Component {
 
@@ -8,14 +9,13 @@ export default class EvaluationsView extends Component {
       return evaluations;
   }
   render() {
-    const data = this.getEvaluations();
     return (
       <>
-      <div class="view-header"></div>
-      <div class="view-content">
-          <CustomTable />
+      <div className="view-header"></div>
+      <div className="view-content">
+          <CustomTable evaluations={evaluations} headCells={evaluationsHeadCells}/>
       </div>
-      <div class="view-footer"></div></>
+      <div className="view-footer"></div></>
     )
   }
 }
