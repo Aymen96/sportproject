@@ -1,9 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import './gridView.css';
+import {moment} from 'moment';
+import { reformatDate, reformatKey } from './utils';
 
-const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
+
+const athleteKeys = ['name', 'age', 'gender', 'sports', 'trainer', 'last_training'];
+const trainingKeys = ['quality', 'achieved', 'planned', 'date', 'start_time', 'end_time', 'comments', 'as_planned', 'difference'];
 
 export default class GridView extends Component {
     render() {
@@ -14,24 +16,23 @@ export default class GridView extends Component {
             <div class="grid-view-column">
                 <div class="grid-view-row">
                     <h5>Personal Data</h5>
-                    {data && Object.keys(data).map((key, index) => {
-                        return index % 2 === 0 && (<tr>
-                            <td style={tableCellStyle}><b>{capitalizeFirstLetter(key)}</b></td>
-                            <td style={tableCellStyle}>{data[key]}</td>
-                            { Object.keys(data).length > index + 1 && 
-                                (<><td style={tableCellStyle}><b>{capitalizeFirstLetter(Object.keys(data)[index + 1])}</b></td>
-                                <td style={tableCellStyle}>{data[Object.keys(data)[index + 1]]}</td></>)
-                            }
+                    {data && athleteKeys.map((key) => {
+                        return (<tr key={"tr-pd-" + key}>
+                            <td style={tableCellStyle}><b>{reformatKey(key)}</b></td>
+                            <td style={tableCellStyle}>{data[key] ? data[key] : '-' }</td>
                         </tr>);
                     })}
                 </div>
             </div>
             <div class="grid-view-column">
                 <div class="grid-view-row">
-                    COL2ROW1
-                </div>
-                <div class="grid-view-row">
-                    COL2ROW2
+                    <h5>Training</h5>
+                    {data && trainingKeys.map( key => {
+                        return (<tr key={"tr-tra-" + key}>
+                            <td style={tableCellStyle}><b>{reformatKey(key)}</b></td>
+                            <td style={tableCellStyle}>{key == 'date' ? reformatDate(data[key]) : data[key]}</td>
+                        </tr>);
+                    })}
                 </div>
             </div>
         </div>

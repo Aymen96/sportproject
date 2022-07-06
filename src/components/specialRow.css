@@ -2,12 +2,13 @@
     padding: 0px 25px;
     display:block;
     width: 100%;
+    position:relative;
 }
 
 .srow-header {
-    width:100%;
-    text-align: right;
-    display:block;
+    position: absolute;
+    top: 0px;
+    right: 10px;
 }
 
 .srow-content {

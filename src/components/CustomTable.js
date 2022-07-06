@@ -19,8 +19,9 @@ import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 import { visuallyHidden } from '@mui/utils';
 import { evaluations, evaluationsHeadCells } from '../temp-data/evaluations';
 import SpecialRow from './SpecialRow';
-import { getComparator, stableSort } from './utils';
+import { getComparator, reformatDate, stableSort } from './utils';
 import './customTable.css';
+import FilterFunction from './FilterFunction';
 
 const rows = evaluations;
 
@@ -73,11 +74,12 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
+const tableCellStyle = {width: '25%', paddingBottom: '8px'};
 
 const EnhancedTableToolbar = () => {
 
   return (
-    <Toolbar
+    <><Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
@@ -89,15 +91,28 @@ const EnhancedTableToolbar = () => {
         id="tableTitle"
         component="div"
       >
-        Evaluations
+        Evaluations of Trainer: TrainerName
       </Typography>
-
-      <Tooltip title="Filter list">
-        <IconButton>
-          <FilterListIcon />
-        </IconButton>
-      </Tooltip>
     </Toolbar>
+    <div style={{padding: '0 18px', marginBottom: '32px'}}>
+        <tr>
+            <td style={tableCellStyle}><b>Training sessions this Month:</b></td>
+            <td style={tableCellStyle}>9</td>
+        </tr>
+        <tr>
+            <td style={tableCellStyle}><b>Number of Athletes:</b></td>
+            <td style={tableCellStyle}>5</td>
+        </tr>
+        <tr>
+            <td style={tableCellStyle}><b>Athletes:</b></td>
+            <td style={tableCellStyle}>{Array.from(new Set(evaluations.map(ev => ev.name))).join(', ')}</td>
+        </tr>
+        <tr>
+            <td style={tableCellStyle}><b>Last Training Session:</b></td>
+            <td style={tableCellStyle}>May 15th, 2022 22:00</td>
+        </tr>
+      </div>
+    </>
   );
 };
 
@@ -174,7 +189,7 @@ export default function CustomTable() {
                             align={'left'}
                             key={"row-element-" + el.id + index}
                             >
-                              {row[el.id]} {el.id == 'name' && chartIcon(showChart)}
+                              {el.id != 'date' ? row[el.id] : reformatDate(row[el.id])}
                           </TableCell>; 
                       })
                       }

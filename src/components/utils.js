@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
       return -1;
@@ -24,4 +26,16 @@ export function stableSort(array, comparator) {
         return a[1] - b[1];
     });
     return stabilizedThis.map((el) => el[0]);
+}
+
+export const reformatKey = string => {
+  if(string.includes('_')) {
+      var parts = string.split('_');
+      return parts.map(str => str.charAt(0).toUpperCase() + str.slice(1)).join(' ');
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export const reformatDate = dateString => {
+  return moment.utc(dateString).format("MMM Do, YYYY HH:mm");
 }

@@ -12,3 +12,15 @@
 .grid-view-row {
     height: auto;
 }
+
+
+.number-input-container {
+    display: inline-block;
+    width: 100px;
+    padding: 0 !important;
+    padding: 0;
+}
+
+.number-input-container input {
+    padding: inherit 0 !important;
+}

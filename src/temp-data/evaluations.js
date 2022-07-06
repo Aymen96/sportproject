@@ -14,7 +14,7 @@ export const evaluations = [
     },
     {
       name: 'John Foster',
-      title: 'Technik/Individualtraining mit Ball',
+      title: 'Ausdauerübungen',
       quality: '5',
       planned: '5',
       achieved: '5',
@@ -27,7 +27,7 @@ export const evaluations = [
     },
     {
       name: 'Martin Foster',
-      title: 'Technik/Individualtraining mit Ball',
+      title: 'Reflex bauen',
       quality: '3',
       planned: '2',
       achieved: '2',
