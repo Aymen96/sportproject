@@ -1,29 +1,22 @@
-import { Input, TextField, Box, Button, FormControl, InputLabel, Select, MenuItem, Switch } from '@mui/material'
-import React, { Component } from 'react'
-import './filterFunction.css';
-
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
+import { TextField, Button, FormControl, InputLabel, Select, MenuItem, Switch } from '@mui/material'
+import React from 'react'
+import './filterFunction.css'
 
 export default function FilterFunction(props) {
-  const {athletes, titles} = props;
-  // Native Select
-  const [personName, setPersonName] = React.useState(null);
-  const [selectedTitle, setSelectedTitle] = React.useState(null);
-  const [planned, setPlanned] = React.useState('-');
+  const {athletes, titles, initialEvaluations, updateEvaluations} = props;
+  
+  // STATE
+
+  const [selectedAthlete, setSelectedAthlete] = React.useState(false);
+  const [selectedTitle, setSelectedTitle] = React.useState(false);
+  const [planned, setPlanned] = React.useState(null);
   const [achieved, setAchieved] = React.useState(null);
   const [difference, setDifference] = React.useState(null);
-  const [filterActive, setFilterActive] = React.useState(false);
+  const [filterNotSet, setFilterNotSet] = React.useState(false); // missing input fields
+  const [filterActive, setFilterActive] = React.useState(false); // filter function is showing
+  
+  // EVENT HANDLERS
+
   const handleChangeMultiple = (event) => {
     const { options } = event.target;
     const value = [];
@@ -32,62 +25,76 @@ export default function FilterFunction(props) {
         value.push(options[i].value);
       }
     }
-    setPersonName(value);
+    setSelectedAthlete(value);
   };
 
-  const NativeSelect = (<FormControl sx={{ m: 1, minWidth: 120, maxWidth: 300 }}>
-    <InputLabel shrink htmlFor="select-multiple-native">
-      Athlete
-    </InputLabel>
-    <Select
-      multiple
-      native
-      value={personName}
-      // @ts-ignore Typings are not considering `native`
-      onChange={handleChangeMultiple}
-      label="Native"
-      inputProps={{
-        id: 'select-multiple-native',
-      }}
-    >
-      {names.map((name) => (
-        <option key={name} value={name}>
-          {name}
-        </option>
-      ))}
-    </Select>
-  </FormControl>);
+  const toggleFilterFunction = () => {
+    setFilterActive(!filterActive);
+  };
+
+  const apply = event => {
+    if(!filterActive) return;
+    if(!selectedAthlete && !selectedTitle && !planned && !achieved && !difference) {
+      setFilterNotSet(true);
+      return;
+    }
+    let filteredData = initialEvaluations;
+    if (selectedAthlete) {
+      filteredData = filteredData.filter(el => el.name === selectedAthlete);
+    }
+    if (selectedTitle) {
+      filteredData = filteredData.filter(el => el.title === selectedTitle);
+    }
+    updateEvaluations(filteredData);
+    setFilterNotSet(false);
+    setFilterActive(false);
+  }
+
+  const reset = event => {
+    setSelectedAthlete(false);
+    setSelectedTitle(false);
+    setPlanned(null);
+    setAchieved(null);
+    setDifference(null);
+    updateEvaluations(initialEvaluations);
+    setFilterNotSet(true);
+  }
+
+  // COMPONENTS
 
   const numberInput = () => {
     return (
       <div style={{marginTop: '18px', width:'100%', padding: 0, display: 'flex', justifyContent: 'space-between'}}>
-        <div class="number-input-container"><TextField
-          type="number"
-          size="small"
-          name="Difference"
-          label="Difference"
-          variant="filled"
-          value={difference}
-          onChange={event => setDifference(event.target.value)}
-        /></div>
-        <div class="number-input-container"><TextField
-          type="number"
-          size="small"
-          name="Achieved"
-          label="Achieved"
-          variant="filled"
-          value={achieved}
-          onChange={event => setAchieved(event.target.value)}
-        /></div>
-        <div class="number-input-container"><TextField
-          type="number"
-          size="small"
-          name="Planned"
-          label="Planned"
-          variant="filled"
-          value={planned}
-          onChange={event  => setPlanned(event.target.value)}
-        /></div>
+        <div className="number-input-container">
+          <TextField
+            type="number"
+            size="small"
+            name="Difference"
+            label="Difference"
+            variant="filled"
+            value={difference}
+            onChange={event => setDifference(event.target.value)}/>
+        </div>
+        <div className="number-input-container">
+          <TextField
+            type="number"
+            size="small"
+            name="Achieved"
+            label="Achieved"
+            variant="filled"
+            value={achieved}
+            onChange={event => setAchieved(event.target.value)}/>
+        </div>
+        <div className="number-input-container">
+          <TextField
+            type="number"
+            size="small"
+            name="Planned"
+            label="Planned"
+            variant="filled"
+            value={planned}
+            onChange={event  => setPlanned(event.target.value)}/>
+        </div>
     </div>
    );
   }
@@ -103,17 +110,15 @@ export default function FilterFunction(props) {
           label={label}
           onChange={onChange}
       >
-        <MenuItem value={0}></MenuItem>
+        <MenuItem value={false}>No selection.</MenuItem>
         {elements && elements.map((el, idx) => {
-          return <MenuItem value={idx + 1} key={'key' + idx}>{el}</MenuItem>
+          return <MenuItem value={el} key={'key-select-' + idx}>{el}</MenuItem>
         })}
       </Select>
     </FormControl>
-  </div>
-);
-const toggleFilterFunction = () => {
-  setFilterActive(!filterActive);
-};
+    </div>
+  );
+
 
   return (
     <div>
@@ -126,15 +131,33 @@ const toggleFilterFunction = () => {
           size="small"/>
       </div>
 
-      {filterActive && (<div class="filter-function-wrapper">
-            <div class="row">
+      {filterActive && (<div className="filter-function-wrapper">
+            <div className="row">
                 <TextField id="search-general" label="Search text" variant="standard" />
-                {selectComponent('Athlete', personName, athletes, (event) => {setPersonName(event.target.value)})}
+                {selectComponent('Athlete', selectedAthlete, athletes, (event) => {setSelectedAthlete(event.target.value)})}
                 {selectComponent('Title', selectedTitle, titles, (event) => {setSelectedTitle(event.target.value)})}
                 {numberInput()}
             </div>
-            <div class="row">
-                <Button variant="contained" style={{marginTop: '12px', width: '33%'}}>Apply</Button>
+            { filterNotSet && (
+              <div style={{margin:'12px 0 0'}}>
+                <span style={{color:'red'}}> *No fields were set. Filter can't be applied. </span>
+              </div>
+            )}
+            <div className="row">
+                <Button 
+                    variant="contained" 
+                    style={{marginTop: '12px', width: '33%'}}
+                    onClick={apply}
+                  >
+                    Apply
+                  </Button>
+                  {!filterNotSet && (<Button 
+                    variant="contained" 
+                    style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
+                    onClick={reset}
+                  >
+                    Reset
+                  </Button>)}
             </div>      
       </div>)}
     </div>

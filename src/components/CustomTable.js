@@ -14,14 +14,12 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 import { visuallyHidden } from '@mui/utils';
 import { evaluations, evaluationsHeadCells } from '../temp-data/evaluations';
 import SpecialRow from './SpecialRow';
 import { getComparator, reformatDate, stableSort } from './utils';
 import './customTable.css';
-import FilterFunction from './FilterFunction';
 
 const rows = evaluations;
 
@@ -45,7 +43,7 @@ function EnhancedTableHead(props) {
       <TableRow>
         {evaluationsHeadCells.filter(headCell => headCell.tableView).map((headCell) => (
           <TableCell
-            key={headCell.id}
+            key={'headcell' + headCell.id}
             align="left"
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -63,6 +61,7 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell></TableCell>
       </TableRow>
     </TableHead>
   );
@@ -94,29 +93,27 @@ const EnhancedTableToolbar = () => {
         Evaluations of Trainer: TrainerName
       </Typography>
     </Toolbar>
-    <div style={{padding: '0 18px', marginBottom: '32px'}}>
+    <table  style={{margin: '0 18px 32px'}}><tbody>
         <tr>
             <td style={tableCellStyle}><b>Training sessions this Month:</b></td>
-            <td style={tableCellStyle}>9</td>
+            <td style={tableCellStyle}>{evaluations.length}</td>
         </tr>
         <tr>
             <td style={tableCellStyle}><b>Number of Athletes:</b></td>
-            <td style={tableCellStyle}>5</td>
-        </tr>
-        <tr>
-            <td style={tableCellStyle}><b>Athletes:</b></td>
-            <td style={tableCellStyle}>{Array.from(new Set(evaluations.map(ev => ev.name))).join(', ')}</td>
+            <td style={tableCellStyle}>{Array.from(new Set(evaluations.map(ev => ev.name))).length}</td>
         </tr>
         <tr>
             <td style={tableCellStyle}><b>Last Training Session:</b></td>
-            <td style={tableCellStyle}>May 15th, 2022 22:00</td>
+            <td style={tableCellStyle}>{reformatDate(Array.from(new Set(evaluations.map(ev => ev.date))).sort().reverse()[0]) }</td>
         </tr>
-      </div>
+        </tbody></table>
     </>
   );
 };
 
-export default function CustomTable() {
+export default function CustomTable(props) {
+  const {evaluations, toggleChartView} = props;
+
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('name');
   const [page, setPage] = React.useState(0);
@@ -135,7 +132,7 @@ export default function CustomTable() {
   };
 
   const handleRowClick = index => {
-    if(index == clickedRow) {
+    if(index === clickedRow) {
       setClickedRow(null);
     } else {
       setClickedRow(index);
@@ -149,9 +146,7 @@ export default function CustomTable() {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const showChart = () => {};
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluations.length) : 0;
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -167,10 +162,10 @@ export default function CustomTable() {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={evaluations.length}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
+              {stableSort(evaluations, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   return (
@@ -179,7 +174,6 @@ export default function CustomTable() {
                       key={'row' + index}
                       role="checkbox"
                       tabIndex={-1}
-                      onClick={() => handleRowClick(index)}
                       style={{backgroundColor: clickedRow !== index ? '#fff' : '#eee'}}
                       className="table-row"
                     >
@@ -188,11 +182,15 @@ export default function CustomTable() {
                           <TableCell 
                             align={'left'}
                             key={"row-element-" + el.id + index}
+                            onClick={() => handleRowClick(index)}
                             >
                               {el.id != 'date' ? row[el.id] : reformatDate(row[el.id])}
                           </TableCell>; 
                       })
                       }
+                      <TableCell align={'center'}>
+                        {chartIcon(() => toggleChartView(row.name))}
+                      </TableCell>
                     </TableRow>
                     <TableRow 
                       key={'special-row' + index}

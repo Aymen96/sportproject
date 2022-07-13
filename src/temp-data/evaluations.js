@@ -13,6 +13,58 @@ export const evaluations = [
       difference: '1'
     },
     {
+      name: 'Mark Foster',
+      title: 'Technik/Individualtraining mit Ball',
+      quality: '2',
+      planned: '3',
+      achieved: '1',
+      comments: '',
+      start_time: '17:52:00',
+      end_time: '17:53:00',
+      date: '2022-04-15T22:00:00.000Z',
+      as_planned: true,
+      difference: '1'
+    },
+    {
+      name: 'Mark Foster',
+      title: 'Ausdauerübungen',
+      quality: '2',
+      planned: '3',
+      achieved: '2',
+      comments: 'Well done!',
+      start_time: '17:52:00',
+      end_time: '17:53:00',
+      date: '2022-05-25T22:00:00.000Z',
+      as_planned: true,
+      difference: '1'
+    },
+    {
+      name: 'Mark Foster',
+      title: 'Technik/Individualtraining mit Ball',
+      quality: '2',
+      planned: '3',
+      achieved: '3',
+      comments: '',
+      start_time: '17:52:00',
+      end_time: '17:53:00',
+      date: '2022-05-01T22:00:00.000Z',
+      as_planned: true,
+      difference: '1'
+    },
+    {
+      name: 'Mark Foster',
+      title: 'Technik/Individualtraining mit Ball',
+      quality: '2',
+      planned: '3',
+      achieved: '1',
+      comments: '',
+      start_time: '17:52:00',
+      end_time: '17:53:00',
+      date: '2022-05-01T22:00:00.000Z',
+      as_planned: true,
+      difference: '1'
+    },
+    {
       name: 'John Foster',
       title: 'Ausdauerübungen',
       quality: '5',
@@ -21,7 +73,7 @@ export const evaluations = [
       comments: 'good',
       start_time: '17:58:00',
       end_time: '17:58:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-16T22:00:00.000Z',
       as_planned: true,
       difference: '0'
     },
@@ -34,7 +86,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-17T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     },
@@ -47,7 +99,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-18T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     },
@@ -60,7 +112,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-19T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     },
@@ -73,7 +125,7 @@ export const evaluations = [
       comments: 'good',
       start_time: '17:58:00',
       end_time: '17:58:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-20T22:00:00.000Z',
       as_planned: true,
       difference: '0'
     },
@@ -86,7 +138,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-21T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     },
@@ -99,7 +151,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-22T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     },
@@ -112,7 +164,7 @@ export const evaluations = [
       comments: 'he is too tired',
       start_time: '17:46:00',
       end_time: '17:46:00',
-      date: '2022-05-15T22:00:00.000Z',
+      date: '2022-05-23T22:00:00.000Z',
       as_planned: false,
       difference: '0'
     }
