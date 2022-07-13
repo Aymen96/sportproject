@@ -46,7 +46,6 @@ export default function FilterFunction(props) {
       filteredData = filteredData.filter(el => el.title === selectedTitle);
     }
     updateEvaluations(filteredData);
-    setFilterNotSet(false);
     setFilterActive(false);
   }
 
@@ -57,7 +56,7 @@ export default function FilterFunction(props) {
     setAchieved(null);
     setDifference(null);
     updateEvaluations(initialEvaluations);
-    setFilterNotSet(true);
+    setFilterNotSet(false);
   }
 
   // COMPONENTS
@@ -130,7 +129,11 @@ export default function FilterFunction(props) {
           inputProps={{ 'aria-label': '' }}
           size="small"/>
       </div>
-
+      {!filterActive && (<div>
+        {selectedAthlete && (<span style={{display: 'block'}}><b>Athlete:</b>{' ' + selectedAthlete}</span>)}
+        {selectedTitle && (<span style={{display: 'block'}}><b>Title:</b>{' ' + selectedTitle}</span>)}
+        <hr />
+      </div>)}
       {filterActive && (<div className="filter-function-wrapper">
             <div className="row">
                 <TextField id="search-general" label="Search text" variant="standard" />
