@@ -12,7 +12,8 @@ export default function FilterFunction(props) {
   const [planned, setPlanned] = React.useState(null);
   const [achieved, setAchieved] = React.useState(null);
   const [difference, setDifference] = React.useState(null);
-  const [filterNotSet, setFilterNotSet] = React.useState(false); // missing input fields
+  const [searchText, setSearchText] = React.useState("");
+  const [filterNotSet, setFilterNotSet] = React.useState(true); // missing input fields
   const [filterActive, setFilterActive] = React.useState(false); // filter function is showing
   
   // EVENT HANDLERS
@@ -34,16 +35,28 @@ export default function FilterFunction(props) {
 
   const apply = event => {
     if(!filterActive) return;
-    if(!selectedAthlete && !selectedTitle && !planned && !achieved && !difference) {
+    if(!selectedAthlete && !selectedTitle && !planned && !achieved && !difference && !searchText) {
       setFilterNotSet(true);
       return;
     }
     let filteredData = initialEvaluations;
+    if (searchText) {
+      filteredData = filteredData.filter(el => (el.name + el.title + el.comments).includes(searchText));
+    }
     if (selectedAthlete) {
       filteredData = filteredData.filter(el => el.name === selectedAthlete);
     }
     if (selectedTitle) {
       filteredData = filteredData.filter(el => el.title === selectedTitle);
+    }
+    if (planned) {
+      filteredData = filteredData.filter(el => el.planned === planned);
+    }
+    if (achieved) {
+      filteredData = filteredData.filter(el => el.achieved === achieved);
+    }
+    if (difference) {
+      filteredData = filteredData.filter(el => el.difference === difference);
     }
     updateEvaluations(filteredData);
     setFilterActive(false);
@@ -136,7 +149,7 @@ export default function FilterFunction(props) {
       </div>)}
       {filterActive && (<div className="filter-function-wrapper">
             <div className="row">
-                <TextField id="search-general" label="Search text" variant="standard" />
+                <TextField id="search-general" label="Search text" variant="standard" onChange={event => setSearchText(event.target.value)}/>
                 {selectComponent('Athlete', selectedAthlete, athletes, (event) => {setSelectedAthlete(event.target.value)})}
                 {selectComponent('Title', selectedTitle, titles, (event) => {setSelectedTitle(event.target.value)})}
                 {numberInput()}
