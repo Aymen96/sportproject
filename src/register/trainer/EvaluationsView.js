@@ -2,18 +2,38 @@ import React, { Component } from 'react'
 import CustomChart from '../../components/CustomChart';
 import CustomTable from '../../components/CustomTable';
 import FilterFunction from '../../components/FilterFunction';
-import { evaluations, evaluationsHeadCells } from '../../temp-data/evaluations';
+import { evaluationsHeadCells } from '../../temp-data/evaluations';
+import axios from "axios";
+import { reformatDate } from '../../utli/dataConversion';
+
+const tableCellStyle = {width: '25%', paddingBottom: '8px'};
+
+async function getEvaluations () {
+  return await axios.create({
+     baseURL: "https://inprove-sport.info:8080",
+     json: true,
+     headers: {
+         "Content-type": "application/json"
+     },
+  }).get("/trainer/getHistory");
+}
 
 export default function EvaluationsView(props) {
 
   const [isChartView, setIsChartView] = React.useState(false);
   const [chartAthlete, setChartAthlete] = React.useState(false);
-  const [filteredEvaluations, setFilterEvaluations] = React.useState(evaluations);
+  const [evaluations, setEvaluations] = React.useState([]);
+  const [filteredEvaluations, setFilterEvaluations] = React.useState([]);
 
-  const updateEvaluations = data => {
-    setFilterEvaluations(data);
+
+  if(evaluations.length === 0) {
+    getEvaluations().then(res => {
+      const athletesData = res['data']['athletes'];
+      setEvaluations(athletesData);
+      setFilterEvaluations(athletesData);
+    });
   }
-  
+
   const differentTitles = new Set(evaluations.map(el => el.title));
   const differentAthletes = new Set(evaluations.map(el => el.name));
 
@@ -25,7 +45,9 @@ export default function EvaluationsView(props) {
           initialEvaluations={evaluations}
           titles={Array.from(differentTitles)} 
           athletes={Array.from(differentAthletes)}
-          updateEvaluations={updateEvaluations}
+          updateEvaluations={(data) => {
+            setFilterEvaluations(data);
+          }}
         />
       </div>
     </div>
@@ -40,13 +62,34 @@ export default function EvaluationsView(props) {
             setIsChartView(false);
           }}
           />
-        : <CustomTable 
-              evaluations={filteredEvaluations} 
+        : <CustomTable
+              rows={filteredEvaluations} 
               headCells={evaluationsHeadCells}
               toggleChartView={athlete => {
                 setChartAthlete(athlete);
                 setIsChartView(!isChartView);
-              }}
+              }} 
+              title={'Evaluations of Trainer: TrainerName'}
+              hasSpecialRow={true}
+              dense={false}
+              statsSection={
+                  <table  style={{margin: '0 18px 32px'}}>
+                    <tbody>
+                      <tr>
+                          <td style={tableCellStyle}><b>Training sessions this Month:</b></td>
+                          <td style={tableCellStyle}>{evaluations.length}</td>
+                      </tr>
+                      <tr>
+                          <td style={tableCellStyle}><b>Number of Athletes:</b></td>
+                          <td style={tableCellStyle}>{Array.from(new Set(evaluations.map(ev => ev.name))).length}</td>
+                      </tr>
+                      <tr>
+                          <td style={tableCellStyle}><b>Last Training Session:</b></td>
+                          <td style={tableCellStyle}>{reformatDate(Array.from(new Set(evaluations.map(ev => ev.date))).sort().reverse()[0]) }</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                }
               />}
         
     </div>

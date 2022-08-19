@@ -1,4 +1,4 @@
-export const evaluations = [
+export const evaluationsLocal = [
     {
       name: 'Mark Foster',
       title: 'Technik/Individualtraining mit Ball',

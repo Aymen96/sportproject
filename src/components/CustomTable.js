@@ -16,12 +16,9 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 import { visuallyHidden } from '@mui/utils';
-import { evaluations, evaluationsHeadCells } from '../temp-data/evaluations';
 import SpecialRow from './SpecialRow';
-import { getComparator, reformatDate, stableSort } from './utils';
+import { getComparator, reformatDate, stableSort } from '../utli/dataConversion.js';
 import './customTable.css';
-
-const rows = evaluations;
 
 const chartIcon = (clickHandle) => {
   return (<Tooltip title="Show as Chart">
@@ -32,7 +29,7 @@ const chartIcon = (clickHandle) => {
 }
 
 function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort } =
+  const { order, orderBy, onRequestSort, headCells } =
     props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -41,7 +38,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        {evaluationsHeadCells.filter(headCell => headCell.tableView).map((headCell) => (
+        {headCells.filter(headCell => headCell.tableView).map((headCell) => (
           <TableCell
             key={'headcell' + headCell.id}
             align="left"
@@ -73,51 +70,13 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
-const tableCellStyle = {width: '25%', paddingBottom: '8px'};
-
-const EnhancedTableToolbar = () => {
-
-  return (
-    <><Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-      }}
-    >
-      <Typography
-        sx={{ flex: '1 1 100%' }}
-        variant="h6"
-        id="tableTitle"
-        component="div"
-      >
-        Evaluations of Trainer: TrainerName
-      </Typography>
-    </Toolbar>
-    <table  style={{margin: '0 18px 32px'}}><tbody>
-        <tr>
-            <td style={tableCellStyle}><b>Training sessions this Month:</b></td>
-            <td style={tableCellStyle}>{evaluations.length}</td>
-        </tr>
-        <tr>
-            <td style={tableCellStyle}><b>Number of Athletes:</b></td>
-            <td style={tableCellStyle}>{Array.from(new Set(evaluations.map(ev => ev.name))).length}</td>
-        </tr>
-        <tr>
-            <td style={tableCellStyle}><b>Last Training Session:</b></td>
-            <td style={tableCellStyle}>{reformatDate(Array.from(new Set(evaluations.map(ev => ev.date))).sort().reverse()[0]) }</td>
-        </tr>
-        </tbody></table>
-    </>
-  );
-};
 
 export default function CustomTable(props) {
-  const {evaluations, toggleChartView} = props;
+  const {rows, toggleChartView, headCells, title, statsSection, hasSpecialRow, dense} = props;
 
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('name');
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [clickedRow, setClickedRow] = React.useState(null);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -146,12 +105,28 @@ export default function CustomTable(props) {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - evaluations.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar />
+      <><Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+      }}
+    >
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        {title}
+      </Typography>
+    </Toolbar>
+    {statsSection}
+    </>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -162,14 +137,15 @@ export default function CustomTable(props) {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={evaluations.length}
+              rowCount={rows.length}
+              headCells={headCells}
             />
             <TableBody>
-              {stableSort(evaluations, getComparator(order, orderBy))
+              {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   return (
-                    <><TableRow
+                    <React.Fragment key={'row-wrapper' + index}><TableRow
                       hover
                       key={'row' + index}
                       role="checkbox"
@@ -177,11 +153,11 @@ export default function CustomTable(props) {
                       style={{backgroundColor: clickedRow !== index ? '#fff' : '#eee'}}
                       className="table-row"
                     >
-                      {evaluationsHeadCells.map(el => {
+                      {headCells.map(el => {
                         return !(el.tableView) ? '' : 
                           <TableCell 
                             align={'left'}
-                            key={"row-element-" + el.id + index}
+                            key={"row-element-" + el.id + "-idx" + index}
                             onClick={() => handleRowClick(index)}
                             >
                               {el.id != 'date' ? row[el.id] : reformatDate(row[el.id])}
@@ -192,7 +168,7 @@ export default function CustomTable(props) {
                         {chartIcon(() => toggleChartView(row.name))}
                       </TableCell>
                     </TableRow>
-                    <TableRow 
+                    {hasSpecialRow && <TableRow 
                       key={'special-row' + index}
                       className="table-row-srow"
                       >
@@ -205,8 +181,8 @@ export default function CustomTable(props) {
                             data={row}
                           />
                         </TableCell>
-                    </TableRow>
-                  </>);
+                    </TableRow>}
+                  </React.Fragment>);
                 })}
               {emptyRows > 0 && (
                 <TableRow
