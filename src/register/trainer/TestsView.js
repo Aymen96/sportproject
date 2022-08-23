@@ -1,7 +1,13 @@
-import React, { Component } from 'react'
+import React from 'react'
 import CustomTable from '../../components/CustomTable';
 import axios from "axios";
 import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 async function getTests () {
   return await axios.create({
@@ -23,7 +29,7 @@ async function getStats () {
   }).get("/csvapi/get_stats");
 }
 
-const getFilterFunction = (space, discipline, allSpaces, allDisciplines, setSpace, setDiscipline, setDateRange) => {
+const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDisciplines, setSpace, setDiscipline, setFromDate, setToDate) => {
   return (<div>
     <div style={{marginTop: '18px', padding: 0}}>
       <FormControl fullWidth size="small">
@@ -59,6 +65,31 @@ const getFilterFunction = (space, discipline, allSpaces, allDisciplines, setSpac
       </Select>
     </FormControl>
     </div>
+    <div style={{marginTop: '18px', padding: 0}}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Stack spacing={3}>
+        <DesktopDatePicker
+          label="Date&Time picker"
+          value={fromDate}
+          onChange={setFromDate}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </Stack>
+    </LocalizationProvider>
+    </div>
+    <div style={{marginTop: '18px', padding: 0}}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Stack spacing={3}>
+        <DesktopDatePicker
+          label="Date&Time picker"
+          value={toDate}
+          onChange={setToDate}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </Stack>
+    </LocalizationProvider>
+    </div>
+    
   </div>);
 }
 
@@ -70,6 +101,8 @@ export default function TestsView(props) {
   const [jsonRecords, setJsonRecords] = React.useState([]);
   const [space, setSpace] = React.useState(false);
   const [discipline, setDiscipline] = React.useState(false);
+  const [fromDate, setFromDate] = React.useState(false);
+  const [toDate, setToDate] = React.useState(false);
   
   if(tests.length === 0) {
     getTests().then(res => {
@@ -93,7 +126,11 @@ export default function TestsView(props) {
     <>
     <div className="view-header">
       <div style={{width:'360px'}}>
-        {getFilterFunction(space, discipline , allSpaces, allDisciplines, (event) => setSpace(event.target.value), (event) => setDiscipline(event.target.value), () => {})}
+        {getFilterFunction(fromDate, toDate, space, discipline , allSpaces, allDisciplines, 
+          event => setSpace(event.target.value), 
+          event => setDiscipline(event.target.value), 
+          event => setFromDate(event.target.value),
+          event => setToDate(event.target.value))}
         <div className="row">
                 <Button
                     variant="contained" 
@@ -113,9 +150,7 @@ export default function TestsView(props) {
       </div>
     </div>
     <div className="view-content">
-      {isChartView ? 
-        "ChartView to be implemented for TESTS"
-        : <CustomTable
+      {<CustomTable
               rows={jsonRecords} 
               headCells={testHeadCells}
               toggleChartView={athlete => {
