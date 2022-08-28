@@ -10,7 +10,7 @@ const tableCellStyle = {width: '25%', paddingBottom: '8px'};
 
 async function getEvaluations () {
   return await axios.create({
-     baseURL: "https://inprove-sport.info:8080",
+     baseURL: "http://inprove-sport.info:80",
      json: true,
      headers: {
          "Content-type": "application/json"
@@ -71,6 +71,7 @@ export default function EvaluationsView(props) {
               }} 
               title={'Evaluations of Trainer: TrainerName'}
               hasSpecialRow={true}
+              hasChartRepresentation={true}
               dense={false}
               statsSection={
                   <table  style={{margin: '0 18px 32px'}}>

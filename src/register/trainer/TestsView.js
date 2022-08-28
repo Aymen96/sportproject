@@ -1,27 +1,33 @@
 import React from 'react'
 import CustomTable from '../../components/CustomTable';
 import axios from "axios";
-import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Button, FormControl, getAppBarUtilityClass, InputLabel, MenuItem, Select } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 
-async function getTests () {
+const defaultDates = {
+  from:new Date(2020, 0, 1),
+  to:new Date(2022, 0, 1),
+};
+
+// requesting data from API
+
+async function getTests (fromDate, toDate) {
   return await axios.create({
-     baseURL: "https://inprove-sport.info:8080",
+     baseURL: "http://inprove-sport.info:80",
      json: true,
      headers: {
          "Content-type": "application/json"
      },
-  }).get("/csvapi/get_slice/1.1.2020/1.1.2023");
+  }).get("/csvapi/get_slice/" + fromDate + "/" + toDate);
 }
 
 async function getStats () {
   return await axios.create({
-     baseURL: "https://inprove-sport.info:8080",
+     baseURL: "http://inprove-sport.info:80",
      json: true,
      headers: {
          "Content-type": "application/json"
@@ -29,8 +35,52 @@ async function getStats () {
   }).get("/csvapi/get_stats");
 }
 
+// utils
+
+const getColLabelsFromData = data => {
+  let labels = [];
+  data.forEach(test => {
+    labels = labels.concat(Object.keys(test['json_record']));
+  })
+  return labels;
+ };
+
+const germanDatePresentation = date => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getUTCFullYear();
+  return day + "." + month + "." + year
+}
+
+// components
+
 const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDisciplines, setSpace, setDiscipline, setFromDate, setToDate) => {
   return (<div>
+    <div style={{marginTop: '18px', padding: 0}}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Stack spacing={3}>
+        <DesktopDatePicker
+          label="From Date"
+          value={fromDate}
+          onChange={setFromDate}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </Stack>
+    </LocalizationProvider>
+    </div>
+    <div style={{marginTop: '18px', padding: 0}}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Stack spacing={3}>
+        <DesktopDatePicker
+          label="To Date"
+          value={toDate}
+          onChange={setToDate}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </Stack>
+    </LocalizationProvider>
+    </div><br></br>
+    Available disciplines and spaces:
     <div style={{marginTop: '18px', padding: 0}}>
       <FormControl fullWidth size="small">
       <InputLabel id="demo-select-small">Discipline</InputLabel>
@@ -38,7 +88,7 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
           labelId="demo-select-small"
           id="demo-select-small"
           value={discipline}
-          label={discipline}
+          label={'Discipline'}
           onChange={setDiscipline}
       >
         <MenuItem value={false}>No selection.</MenuItem>
@@ -55,7 +105,7 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
           labelId="demo-select-small"
           id="demo-select-small"
           value={space}
-          label={space}
+          label={'Space'}
           onChange={setSpace}
       >
         <MenuItem value={false}>No selection.</MenuItem>
@@ -65,63 +115,120 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
       </Select>
     </FormControl>
     </div>
-    <div style={{marginTop: '18px', padding: 0}}>
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Stack spacing={3}>
-        <DesktopDatePicker
-          label="Date&Time picker"
-          value={fromDate}
-          onChange={setFromDate}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </Stack>
-    </LocalizationProvider>
-    </div>
-    <div style={{marginTop: '18px', padding: 0}}>
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Stack spacing={3}>
-        <DesktopDatePicker
-          label="Date&Time picker"
-          value={toDate}
-          onChange={setToDate}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </Stack>
-    </LocalizationProvider>
-    </div>
-    
   </div>);
 }
 
 export default function TestsView(props) {
 
-  const [isChartView, setIsChartView] = React.useState(false);
-  const [chartAthlete, setChartAthlete] = React.useState(false);
-  const [tests, setTests] = React.useState([]);
+  const [allTests, setAllTests] = React.useState([]);
+  const [filteredTests, setFilteredTests] = React.useState([]);
   const [jsonRecords, setJsonRecords] = React.useState([]);
   const [space, setSpace] = React.useState(false);
   const [discipline, setDiscipline] = React.useState(false);
-  const [fromDate, setFromDate] = React.useState(false);
-  const [toDate, setToDate] = React.useState(false);
-  
-  if(tests.length === 0) {
-    getTests().then(res => {
-      const testsData = res['data']['arr'];
-      setTests(testsData);
-      setJsonRecords(testsData.map(t => t['json_record']));
-    });
+  const [fromDate, setFromDate] = React.useState(defaultDates['from']);
+  const [toDate, setToDate] = React.useState(defaultDates['to']);
+  const [allDisciplines, setAllDisciplines] = React.useState([]);
+  const [allSpaces, setAllSpaces] = React.useState([]);
+  const [colLabels, setColLabels] = React.useState([]);
+
+  // event handlers
+  const onApply = () => {
+    let res = allTests;
+    if(discipline) {
+      res = res.filter(el => el['discipline'] === discipline);
+    }
+    if(space) {
+      res = res.filter(el => el['space'] === space);
+    }
+    setFilteredTests(res);
+    setJsonRecords(res.map(t => t['json_record']));
+    setColLabels(getColLabelsFromData(res));
   }
 
-  const allDisciplines = Array.from(new Set(tests.map(el => el.discipline)));
-  const allSpaces = Array.from(new Set(tests.map(el => el.space)));
+  const onReset = () => {
+    setDiscipline(false);
+    setSpace(false);
+    setFilteredTests(allTests);
+  }
 
-  let labels = [];
-  tests.forEach(test => {
-    labels = labels.concat(Object.keys(test['json_record']));
-  })
-  let testHeadCells = Array.from(new Set(labels));
+  const onDownload = () => {
+    // Example data given in question text
+    var data = [
+      ['name1', 'city1', 'some other info'],
+      ['name2', 'city2', 'more info']
+    ];
+
+    var csvContent = '';
+    data.forEach(function(infoArray, index) {
+      var dataString = infoArray.join(';');
+      csvContent += index < data.length ? dataString + '\n' : dataString;
+    });
+    var download = function(content, fileName, mimeType) {
+      var a = document.createElement('a');
+      mimeType = mimeType || 'application/octet-stream';
+
+      if (navigator.msSaveBlob) { // IE10
+        navigator.msSaveBlob(new Blob([content], {
+          type: mimeType
+        }), fileName);
+      } else if (URL && 'download' in a) {
+        a.href = URL.createObjectURL(new Blob([content], {
+          type: mimeType
+        }));
+        a.setAttribute('download', fileName);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } 
+    };
+
+    // execute the download
+    download(csvContent, 'dowload.csv', 'text/csv;encoding:utf-8');
+  }
+
+  const onDatesChange = () => {
+    const from = germanDatePresentation(fromDate).split('.').map(el => parseInt(el));
+    const to = germanDatePresentation(toDate).split('.').map(el => parseInt(el));
+    var fetchData = false;
+    if(from[2] < to[2]) {
+      fetchData = true;
+    } else if(from[2] === to[2]) { // same year
+      if(from[1] < to[1]) {
+        fetchData = true;
+      } else if (from[1] === to[1]) { // same year, same month
+        if (from[0] <= to[0]) { 
+          fetchData = true;
+        }
+      }
+    }
+    if(fetchData) {
+      getTests(germanDatePresentation(fromDate), germanDatePresentation(toDate)).then(res => {
+        const testsData = res['data']['arr'];
+        setAllDisciplines(Array.from(new Set(testsData.map(el => el.discipline))));
+        setAllSpaces(Array.from(new Set(testsData.map(el => el.space))));
+        // reset if the select option is not available anymore
+        if(!allDisciplines.includes(discipline)) {
+          setDiscipline(false);
+        }
+        if(!allSpaces.includes(space)) {
+          setSpace(false);
+        }
+      });
+    }
+  }
+
+  // data preprocessing
+
+  if(allTests.length === 0) {
+    getTests(germanDatePresentation(fromDate), germanDatePresentation(toDate)).then(res => {
+      const testsData = res['data']['arr'];
+      setAllDisciplines(Array.from(new Set(testsData.map(el => el.discipline))));
+      setAllSpaces(Array.from(new Set(testsData.map(el => el.space))));
+    });
+  }
+  let testHeadCells = Array.from(new Set(colLabels));
   testHeadCells = testHeadCells.map(headCell => { return {'id': headCell, 'label': headCell, 'tableView': true}});
-  
+
   return (
     <>
     <div className="view-header">
@@ -129,22 +236,37 @@ export default function TestsView(props) {
         {getFilterFunction(fromDate, toDate, space, discipline , allSpaces, allDisciplines, 
           event => setSpace(event.target.value), 
           event => setDiscipline(event.target.value), 
-          event => setFromDate(event.target.value),
-          event => setToDate(event.target.value))}
+          event => {
+            setFromDate(event);
+            onDatesChange();
+          },
+          event => {
+            setToDate(event);
+            onDatesChange();
+          }
+          )}
         <div className="row">
-                <Button
+                  {<Button
                     variant="contained" 
                     style={{marginTop: '12px', width: '33%'}}
-                    onClick={() => {}}
+                    onClick={onApply}
                   >
                     Apply
-                  </Button>
+                  </Button>}
                   {(<Button 
                     variant="contained" 
                     style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
-                    onClick={() => {}}
+                    onClick={onReset}
                   >
                     Reset
+                  </Button>)}
+                  {(<Button 
+                    variant="contained" 
+                    style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
+                    onClick={onDownload}
+                    disabled={allTests.length == 0}
+                  >
+                    Download
                   </Button>)}
             </div>      
       </div>
@@ -153,12 +275,9 @@ export default function TestsView(props) {
       {<CustomTable
               rows={jsonRecords} 
               headCells={testHeadCells}
-              toggleChartView={athlete => {
-                setChartAthlete(athlete);
-                setIsChartView(!isChartView);
-              }} 
               title={'Tests of Trainer: TrainerName'}
               hasSpecialRow={false}
+              hasChartRepresentation={false}
               dense={true}
               />}
         

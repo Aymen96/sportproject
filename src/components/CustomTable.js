@@ -72,7 +72,7 @@ EnhancedTableHead.propTypes = {
 };
 
 export default function CustomTable(props) {
-  const {rows, toggleChartView, headCells, title, statsSection, hasSpecialRow, dense} = props;
+  const {rows, toggleChartView, headCells, title, statsSection, hasSpecialRow, dense, hasChartRepresentation} = props;
 
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('name');
@@ -164,15 +164,14 @@ export default function CustomTable(props) {
                           </TableCell>; 
                       })
                       }
-                      <TableCell align={'center'}>
+                      {hasChartRepresentation && <TableCell align={'center'}>
                         {chartIcon(() => toggleChartView(row.name))}
-                      </TableCell>
+                      </TableCell>}
                     </TableRow>
                     {hasSpecialRow && <TableRow 
                       key={'special-row' + index}
                       className="table-row-srow"
-                      >
-                        
+                      >  
                         <TableCell colSpan={6} style={clickedRow === index ? {} : { display: 'none'}}>
                           <SpecialRow 
                             handleCloseSpecialRow={() => {
