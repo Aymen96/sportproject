@@ -10,7 +10,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const defaultDates = {
   from:new Date(2020, 0, 1),
-  to:new Date(2022, 0, 1),
+  to:new Date(2023, 0, 1),
 };
 
 // requesting data from API
@@ -48,7 +48,7 @@ const getColLabelsFromData = data => {
 const germanDatePresentation = date => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
-  const year = date.getUTCFullYear();
+  const year = date.getUTCFullYear() + 1;
   return day + "." + month + "." + year
 }
 
@@ -130,39 +130,54 @@ export default function TestsView(props) {
   const [allDisciplines, setAllDisciplines] = React.useState([]);
   const [allSpaces, setAllSpaces] = React.useState([]);
   const [colLabels, setColLabels] = React.useState([]);
+  const [isFirstRender, setIsFirstRender] = React.useState(true);
 
   // event handlers
   const onApply = () => {
-    let res = allTests;
-    if(discipline) {
-      res = res.filter(el => el['discipline'] === discipline);
-    }
-    if(space) {
-      res = res.filter(el => el['space'] === space);
-    }
-    setFilteredTests(res);
-    setJsonRecords(res.map(t => t['json_record']));
-    setColLabels(getColLabelsFromData(res));
+    getTests(germanDatePresentation(fromDate), germanDatePresentation(toDate)).then(res => {
+      let testsData = res['data']['arr'];
+      setAllDisciplines(Array.from(new Set(testsData.map(el => el.discipline))));
+      setAllSpaces(Array.from(new Set(testsData.map(el => el.space))));
+      // filter the data
+      if(discipline) {
+        testsData = testsData.filter(el => el['discipline'] === discipline);
+      }
+      if(space) {
+        testsData = testsData.filter(el => el['space'] === space);
+      }
+      setFilteredTests(testsData);
+      setJsonRecords(testsData.map(t => t['json_record']));
+      setColLabels(getColLabelsFromData(testsData));
+    });
   }
 
   const onReset = () => {
-    setDiscipline(false);
-    setSpace(false);
-    setFilteredTests(allTests);
+    if(discipline || space) {
+      setDiscipline(false);
+      setSpace(false);
+      setFromDate(defaultDates['from']);
+      setToDate(defaultDates['to']);
+      getTests(germanDatePresentation(fromDate), germanDatePresentation(toDate)).then(res => {
+        let testsData = res['data']['arr'];
+        setAllDisciplines(Array.from(new Set(testsData.map(el => el.discipline))));
+        setAllSpaces(Array.from(new Set(testsData.map(el => el.space))));
+        setFilteredTests(testsData);
+        setJsonRecords(testsData.map(t => t['json_record']));
+        setColLabels(getColLabelsFromData(testsData));
+      });
+    }
   }
 
   const onDownload = () => {
     // Example data given in question text
-    var data = [
-      ['name1', 'city1', 'some other info'],
-      ['name2', 'city2', 'more info']
-    ];
+    var data = jsonRecords;
+    console.log(jsonRecords);
+    let csvRows = [Object.keys(data[0])].concat(data);
 
-    var csvContent = '';
-    data.forEach(function(infoArray, index) {
-      var dataString = infoArray.join(';');
-      csvContent += index < data.length ? dataString + '\n' : dataString;
-    });
+    const csvContent = csvRows.map(it => {
+      return Object.values(it).toString()
+    }).join('\n');
+    console.log(csvContent);
     var download = function(content, fileName, mimeType) {
       var a = document.createElement('a');
       mimeType = mimeType || 'application/octet-stream';
@@ -218,12 +233,12 @@ export default function TestsView(props) {
   }
 
   // data preprocessing
-
-  if(allTests.length === 0) {
+  if(isFirstRender) {
     getTests(germanDatePresentation(fromDate), germanDatePresentation(toDate)).then(res => {
       const testsData = res['data']['arr'];
       setAllDisciplines(Array.from(new Set(testsData.map(el => el.discipline))));
       setAllSpaces(Array.from(new Set(testsData.map(el => el.space))));
+      setIsFirstRender(false);
     });
   }
   let testHeadCells = Array.from(new Set(colLabels));
@@ -257,6 +272,10 @@ export default function TestsView(props) {
                     variant="contained" 
                     style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
                     onClick={onReset}
+                    disabled={!discipline 
+                              && !space 
+                              && fromDate.getTime() === defaultDates['from'].getTime()
+                              && toDate.getTime() === defaultDates['to'].getTime() }
                   >
                     Reset
                   </Button>)}
@@ -264,7 +283,7 @@ export default function TestsView(props) {
                     variant="contained" 
                     style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
                     onClick={onDownload}
-                    disabled={allTests.length == 0}
+                    disabled={filteredTests.length == 0}
                   >
                     Download
                   </Button>)}
@@ -279,6 +298,7 @@ export default function TestsView(props) {
               hasSpecialRow={false}
               hasChartRepresentation={false}
               dense={true}
+              rowsPerPage={10}
               />}
         
     </div>

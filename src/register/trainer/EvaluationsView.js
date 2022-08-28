@@ -91,6 +91,7 @@ export default function EvaluationsView(props) {
                     </tbody>
                   </table>
                 }
+                rowsPerPage={5}
               />}
         
     </div>
