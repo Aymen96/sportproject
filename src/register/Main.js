@@ -22,6 +22,8 @@ import EditCoach from "./trainer/editCoach";
 import CsvReader from "../csvHandler/CsvReader";
 import EvaluationsView from './trainer/EvaluationsView';
 import TestsView from './trainer/TestsView';
+import StatsView from './trainer/StatsView';
+
 function Main() {
     const [nvLogin, setnvLogin] = useState(false);
     const onLoginF = () => {
@@ -53,6 +55,7 @@ function Main() {
                             <Route path='/trainer/editCoach' element={<div className="auth-inner"><EditCoach/></div>} />
                             <Route path='/trainer/evaluations' element={<div className="auth-inner data-view"><EvaluationsView/></div>}/>
                             <Route path='/trainer/tests' element={<div className="auth-inner data-view"><TestsView/></div>}/>
+                            <Route path='/trainer/stats' element={<div className="auth-inner data-view"><StatsView/></div>}/>
 
                             <Route path='/csv/reader' element={<div className="csv-inner"><CsvReader/></div>} />
                         </Routes>

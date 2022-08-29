@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
+import { germanDatePresentation } from '../../utli/dataConversion';
 
 const defaultDates = {
   from:new Date(2020, 0, 1),
@@ -25,16 +26,6 @@ async function getTests (fromDate, toDate) {
   }).get("/csvapi/get_slice/" + fromDate + "/" + toDate);
 }
 
-async function getStats () {
-  return await axios.create({
-     baseURL: "http://inprove-sport.info:80",
-     json: true,
-     headers: {
-         "Content-type": "application/json"
-     },
-  }).get("/csvapi/get_stats");
-}
-
 // utils
 
 const getColLabelsFromData = data => {
@@ -44,13 +35,6 @@ const getColLabelsFromData = data => {
   })
   return labels;
  };
-
-const germanDatePresentation = date => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getUTCFullYear() + 1;
-  return day + "." + month + "." + year
-}
 
 // components
 

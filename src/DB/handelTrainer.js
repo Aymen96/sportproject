@@ -55,7 +55,9 @@ export default class HandelTrainer{
     }
 
     static getEvaluations() {
-        return http.post("/evaluations");
+        return http.get("/evaluations");
     }
+
+    // Should I do my requests here ??? 
 
 }

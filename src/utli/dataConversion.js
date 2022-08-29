@@ -39,3 +39,10 @@ export const reformatKey = string => {
 export const reformatDate = dateString => {
   return moment.utc(dateString).format("MMM Do, YYYY HH:mm");
 }
+
+export const germanDatePresentation = date => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getUTCFullYear() + 1;
+  return day + "." + month + "." + year
+}
