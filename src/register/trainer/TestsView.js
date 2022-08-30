@@ -1,7 +1,7 @@
 import React from 'react'
 import CustomTable from '../../components/CustomTable';
 import axios from "axios";
-import { Button, FormControl, getAppBarUtilityClass, InputLabel, MenuItem, Select } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -15,8 +15,8 @@ const defaultDates = {
 };
 
 // requesting data from API
-
 async function getTests (fromDate, toDate) {
+  console.log("http://inprove-sport.info:80/csvapi/get_slice/" + fromDate + "/" + toDate);
   return await axios.create({
      baseURL: "http://inprove-sport.info:80",
      json: true,
@@ -27,7 +27,6 @@ async function getTests (fromDate, toDate) {
 }
 
 // utils
-
 const getColLabelsFromData = data => {
   let labels = [];
   data.forEach(test => {
@@ -37,74 +36,69 @@ const getColLabelsFromData = data => {
  };
 
 // components
-
 const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDisciplines, setSpace, setDiscipline, setFromDate, setToDate) => {
   return (<div>
     <div style={{marginTop: '18px', padding: 0}}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Stack spacing={3}>
+      <Stack spacing={3} style={{width: '33%', display: 'inline-block'}}>
         <DesktopDatePicker
           label="From Date"
           value={fromDate}
           onChange={setFromDate}
-          renderInput={(params) => <TextField {...params} />}
+          style={{width: '340px'}}
+          renderInput={(params) => <TextField style={{width: '340px'}} size="small" {...params} />}
         />
       </Stack>
-    </LocalizationProvider>
-    </div>
-    <div style={{marginTop: '18px', padding: 0}}>
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Stack spacing={3}>
+      <Stack spacing={3} style={{width: '33%', display: 'inline-block'}}>
         <DesktopDatePicker
           label="To Date"
           value={toDate}
           onChange={setToDate}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField style={{width: '340px'}} size="small" {...params} />}
         />
       </Stack>
     </LocalizationProvider>
-    </div><br></br>
-    Available disciplines and spaces:
-    <div style={{marginTop: '18px', padding: 0}}>
-      <FormControl fullWidth size="small">
-      <InputLabel id="demo-select-small">Discipline</InputLabel>
-      <Select
-          labelId="demo-select-small"
-          id="demo-select-small"
-          value={discipline}
-          label={'Discipline'}
-          onChange={setDiscipline}
-      >
-        <MenuItem value={false}>No selection.</MenuItem>
-        {allDisciplines && allDisciplines.map((el, idx) => {
-          return <MenuItem value={el} key={'key-select-discipline-' + idx}>{el}</MenuItem>
-        })}
-      </Select>
-    </FormControl>
     </div>
-    <div style={{marginTop: '18px', padding: 0}}>
-      <FormControl fullWidth size="small">
-      <InputLabel id="demo-select-small">Space</InputLabel>
-      <Select
-          labelId="demo-select-small"
-          id="demo-select-small"
-          value={space}
-          label={'Space'}
-          onChange={setSpace}
-      >
-        <MenuItem value={false}>No selection.</MenuItem>
-        {allSpaces && allSpaces.map((el, idx) => {
-          return <MenuItem value={el} key={'key-select-' + idx}>{el}</MenuItem>
-        })}
-      </Select>
-    </FormControl>
+    <div style={{padding: '8px 0'}}>Available disciplines and spaces:</div>
+    <div style={{padding: 0}}>
+      <FormControl size="small" style={{width: '33%', display: 'inline-block'}}>
+        <InputLabel id="demo-select-small">Discipline</InputLabel>
+        <Select
+            labelId="demo-select-small"
+            id="demo-select-small"
+            value={discipline}
+            label={'Discipline'}
+            onChange={setDiscipline}
+            style={{width: '340px'}}
+        >
+          <MenuItem value={false}>No selection.</MenuItem>
+          {allDisciplines && allDisciplines.map((el, idx) => {
+            return <MenuItem value={el} key={'key-select-discipline-' + idx}>{el}</MenuItem>
+          })}
+        </Select>
+      </FormControl>
+      <FormControl size="small" style={{width: '33%', display: 'inline-block'}}>
+        <InputLabel id="demo-select-small">Space</InputLabel>
+        <Select
+            labelId="demo-select-small"
+            id="demo-select-small"
+            value={space}
+            label={'Space'}
+            onChange={setSpace}
+            style={{width: '340px'}}
+        >
+          <MenuItem value={false}>No selection.</MenuItem>
+          {allSpaces && allSpaces.map((el, idx) => {
+            return <MenuItem value={el} key={'key-select-' + idx}>{el}</MenuItem>
+          })}
+        </Select>
+      </FormControl>
     </div>
   </div>);
 }
 
 export default function TestsView(props) {
 
-  const [allTests, setAllTests] = React.useState([]);
   const [filteredTests, setFilteredTests] = React.useState([]);
   const [jsonRecords, setJsonRecords] = React.useState([]);
   const [space, setSpace] = React.useState(false);
@@ -153,15 +147,12 @@ export default function TestsView(props) {
   }
 
   const onDownload = () => {
-    // Example data given in question text
     var data = jsonRecords;
-    console.log(jsonRecords);
     let csvRows = [Object.keys(data[0])].concat(data);
 
     const csvContent = csvRows.map(it => {
       return Object.values(it).toString()
     }).join('\n');
-    console.log(csvContent);
     var download = function(content, fileName, mimeType) {
       var a = document.createElement('a');
       mimeType = mimeType || 'application/octet-stream';
@@ -231,7 +222,7 @@ export default function TestsView(props) {
   return (
     <>
     <div className="view-header">
-      <div style={{width:'360px'}}>
+      <div>
         {getFilterFunction(fromDate, toDate, space, discipline , allSpaces, allDisciplines, 
           event => setSpace(event.target.value), 
           event => setDiscipline(event.target.value), 
@@ -244,17 +235,18 @@ export default function TestsView(props) {
             onDatesChange();
           }
           )}
-        <div className="row">
-                  {<Button
+        <div style={{marginBottom: '12px', width: '100%'}}>
+                  <div style={{width: '33%', display: 'inline-block'}}>
+                    {<Button
                     variant="contained" 
-                    style={{marginTop: '12px', width: '33%'}}
+                    style={{marginTop: '12px', marginRight: '20px', width: '160px'}}
                     onClick={onApply}
                   >
                     Apply
                   </Button>}
                   {(<Button 
                     variant="contained" 
-                    style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
+                    style={{marginTop: '12px', width: '160px'}}
                     onClick={onReset}
                     disabled={!discipline 
                               && !space 
@@ -263,14 +255,17 @@ export default function TestsView(props) {
                   >
                     Reset
                   </Button>)}
+                  </div>
+                  <div style={{width: '33%', display: 'inline-block'}}>
+                    
                   {(<Button 
                     variant="contained" 
-                    style={{marginTop: '12px', marginLeft: '12px', width: '25%'}}
+                    style={{marginTop: '12px', width: '120px'}}
                     onClick={onDownload}
-                    disabled={filteredTests.length == 0}
+                    disabled={filteredTests.length === 0}
                   >
                     Download
-                  </Button>)}
+                  </Button>)}</div>
             </div>      
       </div>
     </div>

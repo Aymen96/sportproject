@@ -4,6 +4,7 @@ import { reformatDate } from '../../utli/dataConversion';
 
 const tableCellStyle = {width: '25%', paddingBottom: '8px'};
 
+// requesting data from API
 async function getStats () {
     return await Axios.create({
        baseURL: "http://inprove-sport.info:80",
@@ -21,7 +22,6 @@ export default function StatsView (){
             setStats(res['data']['arr']);
         });
     }
-    console.log(stats);
     return (
       <div>
           <table>

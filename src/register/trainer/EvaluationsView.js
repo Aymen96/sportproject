@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import CustomChart from '../../components/CustomChart';
 import CustomTable from '../../components/CustomTable';
 import FilterFunction from '../../components/FilterFunction';
@@ -18,13 +18,11 @@ async function getEvaluations () {
   }).get("/trainer/getHistory");
 }
 
-export default function EvaluationsView(props) {
-
+export default function EvaluationsView() {
   const [isChartView, setIsChartView] = React.useState(false);
   const [chartAthlete, setChartAthlete] = React.useState(false);
   const [evaluations, setEvaluations] = React.useState([]);
   const [filteredEvaluations, setFilterEvaluations] = React.useState([]);
-
 
   if(evaluations.length === 0) {
     getEvaluations().then(res => {
@@ -34,18 +32,19 @@ export default function EvaluationsView(props) {
     });
   }
 
-  const differentTitles = new Set(evaluations.map(el => el.title));
-  const differentAthletes = new Set(evaluations.map(el => el.name));
+  // data preprocessing
+  const titles = Array.from(new Set(evaluations.map(el => el.title)));
+  const athletes = Array.from(new Set(evaluations.map(el => el.name)));
 
   return (
     <>
     <div className="view-header">
-      <div style={{width:'360px'}}>
+      <div>
         <FilterFunction 
           initialEvaluations={evaluations}
-          titles={Array.from(differentTitles)} 
-          athletes={Array.from(differentAthletes)}
-          updateEvaluations={(data) => {
+          titles={titles} 
+          athletes={athletes}
+          updateEvaluations={data => {
             setFilterEvaluations(data);
           }}
         />
@@ -91,12 +90,10 @@ export default function EvaluationsView(props) {
                     </tbody>
                   </table>
                 }
-                rowsPerPage={5}
+                rowsPerPage={10}
               />}
         
     </div>
-    
-    
     <div className="view-footer"></div></>
   )
 }
