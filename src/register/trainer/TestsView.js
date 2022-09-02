@@ -40,28 +40,27 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
   return (<div>
     <div style={{marginTop: '18px', padding: 0}}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Stack spacing={3} style={{width: '33%', display: 'inline-block'}}>
+      <Stack spacing={3} style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
         <DesktopDatePicker
           label="From Date"
           value={fromDate}
           onChange={setFromDate}
-          style={{width: '340px'}}
-          renderInput={(params) => <TextField style={{width: '340px'}} size="small" {...params} />}
+          renderInput={(params) => <TextField style={{width: '90%'}} size="small" {...params} />}
         />
       </Stack>
-      <Stack spacing={3} style={{width: '33%', display: 'inline-block'}}>
+      <Stack spacing={3} style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
         <DesktopDatePicker
           label="To Date"
           value={toDate}
           onChange={setToDate}
-          renderInput={(params) => <TextField style={{width: '340px'}} size="small" {...params} />}
+          renderInput={(params) => <TextField style={{width: '90%'}} size="small" {...params} />}
         />
       </Stack>
     </LocalizationProvider>
     </div>
     <div style={{padding: '8px 0'}}>Available disciplines and spaces:</div>
     <div style={{padding: 0}}>
-      <FormControl size="small" style={{width: '33%', display: 'inline-block'}}>
+      <FormControl size="small" style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
         <InputLabel id="demo-select-small">Discipline</InputLabel>
         <Select
             labelId="demo-select-small"
@@ -69,7 +68,7 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
             value={discipline}
             label={'Discipline'}
             onChange={setDiscipline}
-            style={{width: '340px'}}
+            style={{width: '90%'}}
         >
           <MenuItem value={false}>No selection.</MenuItem>
           {allDisciplines && allDisciplines.map((el, idx) => {
@@ -77,7 +76,7 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
           })}
         </Select>
       </FormControl>
-      <FormControl size="small" style={{width: '33%', display: 'inline-block'}}>
+      <FormControl size="small" style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
         <InputLabel id="demo-select-small">Space</InputLabel>
         <Select
             labelId="demo-select-small"
@@ -85,7 +84,7 @@ const getFilterFunction = (fromDate, toDate, space, discipline, allSpaces, allDi
             value={space}
             label={'Space'}
             onChange={setSpace}
-            style={{width: '340px'}}
+            style={{width: '90%'}}
         >
           <MenuItem value={false}>No selection.</MenuItem>
           {allSpaces && allSpaces.map((el, idx) => {
@@ -236,17 +235,17 @@ export default function TestsView(props) {
           }
           )}
         <div style={{marginBottom: '12px', width: '100%'}}>
-                  <div style={{width: '33%', display: 'inline-block'}}>
+                  <div style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
                     {<Button
                     variant="contained" 
-                    style={{marginTop: '12px', marginRight: '20px', width: '160px'}}
+                    style={{marginTop: '12px', marginRight: '5%', width: '50%'}}
                     onClick={onApply}
                   >
                     Apply
                   </Button>}
                   {(<Button 
                     variant="contained" 
-                    style={{marginTop: '12px', width: '160px'}}
+                    style={{marginTop: '12px', width: '35%'}}
                     onClick={onReset}
                     disabled={!discipline 
                               && !space 
@@ -256,11 +255,11 @@ export default function TestsView(props) {
                     Reset
                   </Button>)}
                   </div>
-                  <div style={{width: '33%', display: 'inline-block'}}>
+                  <div style={{width: '33%', minWidth: '200px', display: 'inline-block'}}>
                     
                   {(<Button 
                     variant="contained" 
-                    style={{marginTop: '12px', width: '120px'}}
+                    style={{marginTop: '12px', width: '50%'}}
                     onClick={onDownload}
                     disabled={filteredTests.length === 0}
                   >
